@@ -1,0 +1,93 @@
+name: Build
+
+on: [push, workflow_dispatch]
+
+jobs:
+  buildRust:
+    name: opus-cp-${{ matrix.platform.build-for }}
+    runs-on: ${{ matrix.platform.os }}
+    strategy: 
+      matrix:
+        platform:
+          - build-for: windows_64
+            target: x86_64-pc-windows-msvc
+            bin: opus_cp.dll
+            os: windows-latest
+          - build-for: windows_32
+            target: i686-pc-windows-msvc
+            bin: opus_cp.dll
+            os: windows-latest
+          - build-for: linux_64
+            target: x86_64-unknown-linux-gnu
+            bin: libopus_cp.so
+            os: ubuntu-latest
+          - build-for: linux_32
+            target: i686-unknown-linux-gnu
+            bin: libopus_cp.so
+            os: ubuntu-latest
+          - build-for: linux_arm64
+            target: aarch64-unknown-linux-gnu
+            bin: libopus_cp.so
+            os: ubuntu-latest
+          - build-for: linux_arm
+            target: arm-unknown-linux-gnueabi
+            bin: libopus_cp.so
+            os: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+          target: ${{ matrix.platform.target }}
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: "rust-cache-${{ matrix.platform.target }}"
+          workspaces: "./opus-cp/rust -> ./opus-cp/rust/target"
+      - name: Caching natives
+        uses: actions/cache@v2
+        id: nativecache
+        with:
+          path: natives
+          key: nativeArtifacts${{ github.run_number}}
+      - name: Build target
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --manifest-path opus-cp/rust/Cargo.toml --target ${{ matrix.platform.target }}
+      - name: Packing native
+        run: |
+          mkdir natives
+          mkdir natives/${{ matrix.platform.build-for }}
+          cp opus-cp/rust/target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }} natives/${{ matrix.platform.build-for }}/
+  buildJar:
+    needs: buildRust
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - run: chmod +x gradlew
+      - name: Caching natives
+        uses: actions/cache@v2
+        with:
+          path: natives
+          key: nativeArtifacts${{ github.run_number}}
+      - name: Install java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - name: Build jar
+        run: ./gradlew build
+      - name: Upload jar
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ github.event.repository.name }}
+          path: build/libs/
+      
+        
+
