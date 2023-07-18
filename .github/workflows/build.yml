@@ -53,7 +53,7 @@ jobs:
         id: nativecache
         with:
           path: natives
-          key: nativeArtifacts${{ github.run_number}}
+          key: nativeArtifacts${{ github.event.ref }}
       - name: Build target
         uses: actions-rs/cargo@v1
         with:
@@ -76,7 +76,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: natives
-          key: nativeArtifacts${{ github.run_number}}
+          key: nativeArtifacts${{ github.event.ref }}
       - name: Install java
         uses: actions/setup-java@v1
         with:
