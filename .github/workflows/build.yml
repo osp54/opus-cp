@@ -59,12 +59,12 @@ jobs:
         with:
           use-cross: true
           command: build
-          args: --release --manifest-path opus-cp/rust/Cargo.toml --target ${{ matrix.platform.target }}
+          args: --release --manifest-path rust/Cargo.toml --target ${{ matrix.platform.target }}
       - name: Packing native
         run: |
           mkdir natives
           mkdir natives/${{ matrix.platform.build-for }}
-          cp opus-cp/rust/target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }} natives/${{ matrix.platform.build-for }}/
+          cp rust/target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }} natives/${{ matrix.platform.build-for }}/
   buildJar:
     needs: buildRust
     runs-on: ubuntu-latest
