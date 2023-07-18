@@ -54,15 +54,15 @@ jobs:
           use-cross: true
           command: build
           args: --release --manifest-path rust/Cargo.toml --target ${{ matrix.platform.target }}
-      #- name: Packing native
-      #  run: |
-      #    mkdir natives
-      #    mkdir natives/${{ matrix.platform.build-for }}
-      #    cp rust/target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }} natives/${{ matrix.platform.build-for }}/
+      - name: Packing native
+        run: |
+          mkdir natives
+          mkdir natives/${{ matrix.platform.build-for }}
+          cp rust/target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }} natives/${{ matrix.platform.build-for }}/
       - name: Upload native
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.platform.build-for }}
+          name: natives
           path: rust/target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
         
   buildJar:
@@ -72,11 +72,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       - run: chmod +x gradlew
-      - name: Download artifact
-        id: download-artifact
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          path: natives
       - name: Install java
         uses: actions/setup-java@v1
         with:
