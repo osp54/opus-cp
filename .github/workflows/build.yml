@@ -75,12 +75,13 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: natives
+          path: natives
       - name: Install java
         uses: actions/setup-java@v1
         with:
           java-version: 8
       - name: Build jar
-        run: ./gradlew build
+        run: tree . && ./gradlew build
       - name: Upload jar
         uses: actions/upload-artifact@v2
         with:
