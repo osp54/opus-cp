@@ -10,7 +10,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2' 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     
-    implementation 'org.scijava:native-lib-loader:2.4.0'
+    api 'org.scijava:native-lib-loader:2.4.0'
 }
 
 processResources {
