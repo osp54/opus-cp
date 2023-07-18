@@ -63,7 +63,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: natives
-          path: rust/target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
+          path: natives
         
   buildJar:
     needs: buildRust
